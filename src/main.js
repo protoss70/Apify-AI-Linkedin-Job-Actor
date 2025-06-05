@@ -73,8 +73,8 @@ if (!jobPosts || jobPosts.length === 0){
     await Actor.fail("Failed to scrape job posts on linkedin");
 }
 
+console.log("🔎 Job post analysis started.")
 for (const job of jobPosts) {
-    console.log("🔎 Job post analysis started.")
     const {
         job_overview,
         requirements,
