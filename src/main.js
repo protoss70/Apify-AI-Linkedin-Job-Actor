@@ -136,7 +136,7 @@ for (const job of jobPosts) {
         console.log("❌ Job post with bad match skipped")
     }
 
-    if (results.length > target_num_results) break;
+    if (results.length >= target_num_results) break;
 }
 
 await Actor.setValue('OUTPUT', results);
