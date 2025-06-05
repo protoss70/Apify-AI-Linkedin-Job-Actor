@@ -3,7 +3,7 @@ import { validateLocationMatch } from './llm.js';
 
 const APIFY_TOKEN = process.env.APIFY_TOKEN;
 
-const MAX_GEO_ID_ATTEMPTS = 3;
+const MAX_GEO_ID_ATTEMPTS = 5;
 
 const jobTypes = {
   "full_time": "F",
