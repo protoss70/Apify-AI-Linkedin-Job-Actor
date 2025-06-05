@@ -1,64 +1,52 @@
-# Empty JavaScript template
+# AI-Powered LinkedIn Job Matching Actor
 
-Start a new [web scraping](https://apify.com/web-scraping) project quickly and easily in JavaScript (Node.js) with our empty project template. It provides a basic structure for building an Actor with [Apify SDK](https://docs.apify.com/sdk/js/) and allows you to easily add your own functionality.
+This Apify actor uses AI to match job seekers with relevant LinkedIn job posts based on their CV, preferences, and career goals.
 
-## Included features
+## 🧠 How It Works
 
-- **[Apify SDK](https://docs.apify.com/sdk/js/)** - toolkit for building [Actors](https://apify.com/actors)
-- **[Crawlee](https://crawlee.dev/)** - web scraping and browser automation library
+The actor takes in structured user input including:
 
-## How it works
+- **CV**: The candidate’s resume as raw text
+- **Work Environment Preference**: e.g., hybrid, on-site, remote
+- **Work Type**: e.g., full-time, part-time, contract
+- **User Prompt**: A free-text description of the candidate’s career goals, aspirations, or specific preferences
+- **Target Number of Results**: Number of job matches to return
+- **Preferred Work Location**: A city/country name to find matching job openings (Please match the naming conventions on Linkedin)
 
-This template is useful when you're already familiar with the [Apify SDK](https://docs.apify.com/sdk/js) and [Crawlee](https://crawlee.dev/) and want to start with a clean slate. It does not include `puppeteer` or `playwright` so install them manually and update the Dockerfile if you need them.
+### 🔄 Workflow
 
-## Resources
+1. **GeoID Resolution**  
+   The actor determines the correct LinkedIn `geoId` for the user's preferred work location.
 
-- [Node.js tutorials](https://docs.apify.com/academy/node-js) in Academy
-- [Video guide on getting data using Apify API](https://www.youtube.com/watch?v=ViYYDHSBAKM)
-- [Integration with Make](https://apify.com/integrations), GitHub, Zapier, Google Drive, and other apps
-- A short guide on how to create Actors using code templates:
+2. **User Profile Analysis**  
+   An AI agent analyzes the user's CV, career preferences, and constraints to create a structured candidate profile.
 
-[web scraper template](https://www.youtube.com/watch?v=u-i-Korzf8w)
+3. **Job Scraping**  
+   The actor uses [`curious_coder/linkedin-jobs-scraper`](https://apify.com/curious_coder/linkedin-jobs-scraper) to scrape job postings from LinkedIn based on the user's criteria.
 
+4. **Job Post Analysis**  
+   Another AI agent analyzes each job post to summarize it, extract strict requirements, and describe its potential career path.
 
-## Getting started
+5. **Candidate-to-Job Matching**  
+   A second AI agent compares each job post to the candidate profile and evaluates:
+   - Job requirements match
+   - Career path alignment
+   - Experience level compatibility
+   - Location match
+   - Overall fit
 
-For complete information [see this article](https://docs.apify.com/platform/actors/development#build-actor-locally). To run the Actor use the following command:
+Only job posts that pass the matching criteria are returned as results.
 
-```bash
-apify run
-```
+---
 
-## Deploy to Apify
+## 📦 Output
 
-### Connect Git repository to Apify
+The actor returns a list of matched job posts with annotations describing why they fit the candidate profile.
 
-If you've created a Git repository for the project, you can easily connect to Apify:
+---
 
-1. Go to [Actor creation page](https://console.apify.com/actors/new)
-2. Click on **Link Git Repository** button
+## 🤖 Powered by
 
-### Push project on your local machine to Apify
-
-You can also deploy the project on your local machine to Apify without the need for the Git repository.
-
-1. Log in to Apify. You will need to provide your [Apify API Token](https://console.apify.com/account/integrations) to complete this action.
-
-    ```bash
-    apify login
-    ```
-
-2. Deploy your Actor. This command will deploy and build the Actor on the Apify Platform. You can find your newly created Actor under [Actors -> My Actors](https://console.apify.com/actors?tab=my).
-
-    ```bash
-    apify push
-    ```
-
-## Documentation reference
-
-To learn more about Apify and Actors, take a look at the following resources:
-
-- [Apify SDK for JavaScript documentation](https://docs.apify.com/sdk/js)
-- [Apify SDK for Python documentation](https://docs.apify.com/sdk/python)
-- [Apify Platform documentation](https://docs.apify.com/platform)
-- [Join our developer community on Discord](https://discord.com/invite/jyEM2PRvMU)
+- Apify SDK
+- OpenAI API (`gpt-4o`)
+- Apify's `linkedin-jobs-scraper` actor
