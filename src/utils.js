@@ -1,4 +1,5 @@
 import { ApifyClient } from 'apify-client';
+import { gotScraping } from 'got-scraping';
 
 import log from '@apify/log';
 
@@ -26,28 +27,49 @@ const WORKPLACE_TYPES = {
  */
 export async function extractGeoId(workLocation) {
     try {
-        const searchUrl = `https://www.linkedin.com/jobs/search?keywords=&location=${encodeURIComponent(workLocation)}`;
-        const response = await fetch(searchUrl, {
-            headers: { 'User-Agent': 'Mozilla/5.0' },
-        });
-        const html = await response.text();
+        // const proxyConfiguration = await Actor.createProxyConfiguration();
+        // const proxyUrl = proxyConfiguration.newUrl();
 
+        const { PROXY_USERNAME, PROXY_PASSWORD } = process.env;
+
+        const searchUrl = `https://www.linkedin.com/jobs/search?keywords=&location=${encodeURIComponent(workLocation)}`;
+
+        const response = await gotScraping({
+            url: searchUrl,
+            proxyUrl: `http://${PROXY_USERNAME}:${PROXY_PASSWORD}@proxy.apify.com:8000`,
+            headers: {
+                'User-Agent': 'Mozilla/5.0',
+            },
+        });
+
+        const html = response.body;
         const geoIdMatch = html.match(/<input name="geoId" value="(\d+)" type="hidden">/);
         const geoId = geoIdMatch ? geoIdMatch[1] : null;
-        if (!geoId) return false;
+        if (!geoId) {
+            log.warning('⚠️ No geoId found in initial search page.');
+            return false;
+        }
 
         const validationUrl = `https://www.linkedin.com/jobs/search/?geoId=${geoId}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true`;
-        const validationResponse = await fetch(validationUrl, {
-            headers: { 'User-Agent': 'Mozilla/5.0' },
+
+        const validationResponse = await gotScraping({
+            url: validationUrl,
+            proxyUrl: `http://${PROXY_USERNAME}:${PROXY_PASSWORD}@proxy.apify.com:8000`,
+            headers: {
+                'User-Agent': 'Mozilla/5.0',
+            },
         });
-        const validationHtml = await validationResponse.text();
+        const validationHtml = validationResponse.body;
 
         const locationMatch = validationHtml.match(
             /<div class="search-bar__full-placeholder[^"]*">\s*<!---->\s*([^<]+?)\s*<!---->/,
         );
         const resolvedLocation = locationMatch ? locationMatch[1].trim() : null;
 
-        if (!resolvedLocation) return false;
+        if (!resolvedLocation) {
+            log.warning(`⚠️ geoId "${geoId}" resolved, but location label not found`);
+            return false;
+        }
 
         return { geoId, resolvedLocation };
     } catch (error) {
