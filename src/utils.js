@@ -1,10 +1,12 @@
 import { ApifyClient } from 'apify-client';
 
+import log from '@apify/log';
+
 import { validateLocationMatch } from './llm.js';
 
 const { APIFY_TOKEN } = process.env;
 
-const maxGeoIdAttempts = 5;
+const MAX_GEO_ID_ATTEMPTS = 5;
 
 const JOB_TYPES = {
     fullTime: 'F',
@@ -49,7 +51,7 @@ export async function extractGeoId(workLocation) {
 
         return { geoId, resolvedLocation };
     } catch (error) {
-        console.error('extractGeoId failed:', error);
+        log.error('❌ extractGeoId failed:', error);
         return false;
     }
 }
@@ -62,7 +64,7 @@ export async function geoLocationExtractor(workLocation) {
         let attempt = 0;
         let currentLocation = workLocation;
 
-        while (attempt < maxGeoIdAttempts) {
+        while (attempt < MAX_GEO_ID_ATTEMPTS) {
             const extracted = await extractGeoId(currentLocation);
             if (!extracted) return false;
 
@@ -70,19 +72,20 @@ export async function geoLocationExtractor(workLocation) {
             const { match, alternative } = await validateLocationMatch(resolvedLocation, currentLocation);
 
             if (match) {
-                console.log('resolving: ', '\n', workLocation, '\n', currentLocation, '\n', resolvedLocation);
+                log.info('✅ Resolved geoId match:');
+                log.debug(`Original: ${workLocation}, Current: ${currentLocation}, Resolved: ${resolvedLocation}`);
                 return geoId;
             }
 
-            console.log('Geo Id mismatch: ', workLocation, resolvedLocation);
-            console.log(`Attempt ${attempt + 1}: No match. Trying alternative: "${alternative}"`);
+            log.warning(`⚠️ GeoId mismatch: ${workLocation} ≠ ${resolvedLocation}`);
+            log.info(`🔁 Attempt ${attempt + 1}: Trying alternative → "${alternative}"`);
             currentLocation = alternative;
             attempt++;
         }
 
         return false;
     } catch (error) {
-        console.error('geoLocationExtractor failed:', error);
+        log.error('❌ geoLocationExtractor failed:', error);
         return false;
     }
 }
@@ -108,13 +111,13 @@ export async function runLinkedinJobScrapeActor({ count, scrapeCompany, urls }) 
     const client = new ApifyClient({ token: APIFY_TOKEN });
 
     const actorClient = client.actor('curious_coder/linkedin-jobs-scraper');
-    console.log('Scraping Linkedin for job posts');
+    log.info('🧠 Scraping LinkedIn for job posts...');
     const input = { count, scrapeCompany, urls };
 
     const run = await actorClient.call(input);
 
     const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: 100 });
-    console.log('Scraper finished.');
+    log.info('✅ Scraper finished.');
 
     return items;
 }

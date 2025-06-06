@@ -1,6 +1,8 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod.mjs';
 
+import log from '@apify/log';
+
 import { prompts } from './prompts.js';
 
 const openai = new OpenAI({
@@ -39,7 +41,7 @@ export async function analyseCV(cvContent, userPrompt) {
             outputStructure: outputSchema,
         });
     } catch (error) {
-        console.error('analyseCV failed:', error);
+        log.error('❌ analyseCV failed:', error);
         return false;
     }
 }
@@ -58,7 +60,7 @@ export async function validateLocationMatch(resolvedLocation, workLocation) {
             outputStructure: outputSchema,
         });
     } catch (error) {
-        console.error('validateLocationMatch failed:', error);
+        log.error('❌ validateLocationMatch failed:', error);
         return false;
     }
 }
@@ -77,7 +79,7 @@ export async function analyseJobPost(jobPostText, companyInfo) {
             outputStructure: outputSchema,
         });
     } catch (error) {
-        console.error('analyseJobPost failed:', error);
+        log.error('❌ analyseJobPost failed:', error);
         return false;
     }
 }
@@ -120,7 +122,7 @@ export async function compareCandidateToJob({
             outputStructure: outputSchema,
         });
     } catch (error) {
-        console.error('compareCandidateToJob failed:', error);
+        log.error('❌ compareCandidateToJob failed:', error);
         return false;
     }
 }

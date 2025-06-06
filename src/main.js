@@ -2,6 +2,8 @@ import 'dotenv/config.js';
 
 import { Actor } from 'apify';
 
+import log from '@apify/log';
+
 import { analyseCV, analyseJobPost, compareCandidateToJob } from './llm.js';
 import { geoLocationExtractor, linkedinSearchQueryBuilder, runLinkedinJobScrapeActor } from './utils.js';
 
@@ -11,8 +13,8 @@ await Actor.init();
 const results = [];
 
 const input = await Actor.getInput();
-console.log('Received input: ');
-console.dir(input, { depth: null });
+log.info('📥 Received input:');
+log.debug(input);
 
 const { cvContent, workEnv, workType, workLocation, prompt, targetNumResults } = input;
 
@@ -23,7 +25,7 @@ if (typeof targetNumResults !== 'number' || targetNumResults < 1 || targetNumRes
 
 // Step 1: Try to find the geoId of LinkedIn for location matching.
 const geoId = await geoLocationExtractor(workLocation);
-console.log(geoId);
+log.info(`🌐 geoId: ${geoId}`);
 if (!geoId) {
     await Actor.fail('Failed to find the correct geoId!');
 }
@@ -36,8 +38,8 @@ if (!outputAnalyzeCv) {
 
 const { overview, careerPath, education, languages, possibleRoles } = outputAnalyzeCv;
 
-console.log(
-    `Candidate Analysis:
+log.info(
+    `📄 Candidate Analysis:
 ---------------------
 Overview: ${overview}
 
@@ -53,7 +55,7 @@ Possible Roles: ${possibleRoles.join(', ')}
 );
 
 // Step 3: Scrape job posts on LinkedIn
-console.log(`🔍 LinkedIn Query Builder Params:
+log.info(`🔍 LinkedIn Query Builder Params:
   • geoId: ${geoId}
   • workType: ${workType}
   • workEnv: ${workEnv}
@@ -66,14 +68,16 @@ const urls = linkedinSearchQueryBuilder({
     keywords: possibleRoles,
 });
 
-console.log('Linkedin Search URLs: ', urls);
+log.info('🔗 LinkedIn Search URLs:');
+log.debug(urls);
+
 const jobPosts = await runLinkedinJobScrapeActor({ count: 100, scrapeCompany: true, urls: [urls[0]] });
 
 if (!jobPosts || jobPosts.length === 0) {
     await Actor.fail('Failed to scrape job posts on LinkedIn');
 }
 
-console.log('🔎 Job post analysis started.');
+log.info('🔎 Job post analysis started.');
 for (const job of jobPosts) {
     const {
         jobOverview,
@@ -98,26 +102,26 @@ for (const job of jobPosts) {
         });
 
     if (overallMatch) {
-        console.log(
+        log.info(
             `📝 Candidate vs Job Match Result
-            -----------------------------------------
-            📌 Job Requirements Match:
-            ${jobRequirementsMatch}
+-----------------------------------------
+📌 Job Requirements Match:
+${jobRequirementsMatch}
 
-            📈 Career Path Match:
-            ${careerPathMatch}
+📈 Career Path Match:
+${careerPathMatch}
 
-            🎯 Experience Level Match:
-            ${experienceLevelMatch}
+🎯 Experience Level Match:
+${experienceLevelMatch}
 
-            🌍 Location Match:
-            ${locationMatch}
+🌍 Location Match:
+${locationMatch}
 
-            ✅ Overall Match:
-            ${overallMatch ? 'YES' : 'NO'}
+✅ Overall Match:
+YES
 
-            Total Matches: ${results.length + 1}
-            -----------------------------------------`,
+Total Matches: ${results.length + 1}
+-----------------------------------------`,
         );
 
         results.push({
@@ -128,7 +132,7 @@ for (const job of jobPosts) {
             experienceLevelMatch,
         });
     } else {
-        console.log('❌ Job post with bad match skipped');
+        log.warning('❌ Job post with bad match skipped');
     }
 
     if (results.length >= targetNumResults) break;
