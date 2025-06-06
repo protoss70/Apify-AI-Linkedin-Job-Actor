@@ -134,5 +134,11 @@ for (const job of jobPosts) {
     if (results.length >= targetNumResults) break;
 }
 
-await Actor.setValue('OUTPUT', results);
+await Actor.pushData({
+    results,
+    workLocation,
+    workType,
+    workEnv,
+});
+
 await Actor.exit();
