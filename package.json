@@ -1,32 +1,33 @@
 {
-	"name": "AI-Linkedin-Job-Search",
-	"version": "0.0.1",
-	"type": "module",
-	"description": "This is a boilerplate of an Apify Actor.",
-	"engines": {
-		"node": ">=18.0.0"
-	},
-	"dependencies": {
-		"apify": "^3.2.6",
-		"crawlee": "^3.11.5",
-		"dotenv": "^16.5.0",
-		"openai": "^5.1.0",
-		"zod": "^3.25.51"
-	},
-	"devDependencies": {
-		"@apify/eslint-config": "^1.0.0",
-		"eslint": "^9.27.0",
-		"eslint-config-prettier": "^10.1.5",
-		"prettier": "^3.5.3"
-	},
-	"scripts": {
-		"start": "node ./src/main.js",
-		"format": "prettier --write .",
-		"format:check": "prettier --check .",
-		"lint": "eslint",
-		"lint:fix": "eslint --fix",
-		"test": "echo \"Error: oops, the Actor has no tests yet, sad!\" && exit 1"
-	},
-	"author": "It's not you it's me",
-	"license": "ISC"
+    "name": "AI-Linkedin-Job-Search",
+    "version": "0.0.1",
+    "type": "module",
+    "description": "An llm powered linkedin job post searching actor, which filteres and only returns jobs which match the users cv.",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "dependencies": {
+        "apify": "^3.2.6",
+        "apify-client": "^2.12.5",
+        "crawlee": "^3.11.5",
+        "dotenv": "^16.5.0",
+        "openai": "^5.1.0",
+        "zod": "^3.25.51"
+    },
+    "devDependencies": {
+        "@apify/eslint-config": "^1.0.0",
+        "eslint": "^9.27.0",
+        "eslint-config-prettier": "^10.1.5",
+        "prettier": "^3.5.3"
+    },
+    "scripts": {
+        "start": "node ./src/main.js",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "lint": "eslint",
+        "lint:fix": "eslint --fix",
+        "test": "echo \"Error: oops, the Actor has no tests yet, sad!\" && exit 1"
+    },
+    "author": "It's not you it's me",
+    "license": "ISC"
 }

@@ -29,11 +29,11 @@ The actor takes in structured user input including:
 
 5. **Candidate-to-Job Matching**  
    A second AI agent compares each job post to the candidate profile and evaluates:
-   - Job requirements match
-   - Career path alignment
-   - Experience level compatibility
-   - Location match
-   - Overall fit
+    - Job requirements match
+    - Career path alignment
+    - Experience level compatibility
+    - Location match
+    - Overall fit
 
 Only job posts that pass the matching criteria are returned as results.
 
