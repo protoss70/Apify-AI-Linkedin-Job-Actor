@@ -1,3 +1,4 @@
+import { Actor } from 'apify';
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod.mjs';
 
@@ -23,6 +24,10 @@ export async function askOpenAI({ model, systemPrompt, userPrompt, outputStructu
             format: zodTextFormat(outputStructure, 'structuredOutput'),
         },
     });
+
+    if (model === 'gpt-4o') {
+        await Actor.charge({ eventName: 'gpt-4o_call' });
+    }
 
     return response.output_parsed;
 }

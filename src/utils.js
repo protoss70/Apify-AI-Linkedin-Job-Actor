@@ -28,12 +28,13 @@ const WORKPLACE_TYPES = {
 export async function extractGeoId(workLocation) {
     try {
         const { PROXY_USERNAME, PROXY_PASSWORD } = process.env;
+        const proxyUrl = `http://${PROXY_USERNAME}:${PROXY_PASSWORD}@proxy.apify.com:8000`;
 
         const searchUrl = `https://www.linkedin.com/jobs/search?keywords=&location=${encodeURIComponent(workLocation)}`;
 
         const response = await gotScraping({
             url: searchUrl,
-            proxyUrl: `http://${PROXY_USERNAME}:${PROXY_PASSWORD}@proxy.apify.com:8000`,
+            proxyUrl,
             headers: {
                 'User-Agent': 'Mozilla/5.0',
             },
@@ -51,7 +52,7 @@ export async function extractGeoId(workLocation) {
 
         const validationResponse = await gotScraping({
             url: validationUrl,
-            proxyUrl: `http://${PROXY_USERNAME}:${PROXY_PASSWORD}@proxy.apify.com:8000`,
+            proxyUrl,
             headers: {
                 'User-Agent': 'Mozilla/5.0',
             },
