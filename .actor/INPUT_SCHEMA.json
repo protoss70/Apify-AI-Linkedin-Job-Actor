@@ -7,7 +7,7 @@
             "title": "CV Content",
             "type": "string",
             "description": "Please parse the content of your cv here, Markdown or just plain text",
-            "default": "# Gokdeniz k.\n## Experience: \nFrontend Engineer | Awesome company 1...",
+            "default": "# Clark Kent\n\n## 💼 Experience\n**Investigative Journalist**  \nDaily Planet — 2015–Present  \n- Reported on major global events with a focus on justice and accountability\n- Conducted in-depth interviews and investigations under tight deadlines\n- Received 'Journalist of the Year' award in 2021\n\n**Freelance Writer**  \nVarious Publications — 2012–2015  \n- Contributed articles on science, technology, and human interest stories\n- Developed strong research and narrative storytelling skills\n\n## 🎓 Education\n**B.A. in Journalism**  \nMetropolis University — 2008–2012\n\n## 🧠 Skills\n- Investigative Reporting\n- Feature Writing\n- Media Ethics\n- Photography & Editing\n\n## 🌐 Languages\n- English (Native)\n- Kryptonian (Basic)\n\n## 🚀 Career Interests\nSeeking a challenging journalism role focused on social justice, investigative reporting, and impact storytelling. Passionate about uncovering the truth and holding power accountable.",
             "editor": "textarea"
         },
         "workEnv": {
@@ -39,7 +39,7 @@
             "title": "Prompt",
             "type": "string",
             "description": "Please describe what you are looking for. What kind of role, any important details the AI agent should look for.",
-            "default": "I am looking for a leadership role for a highly technical team of software engineers.",
+            "default": "I'm looking for a backend or fullstack engineering role at a tech-driven company where I can take ownership of features, work closely with product teams, and contribute to building scalable, well-tested systems. I'm especially interested in roles that offer learning opportunities in cloud infrastructure, system design, and AI integration.",
             "editor": "textarea"
         },
         "targetNumResults": {

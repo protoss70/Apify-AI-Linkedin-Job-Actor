@@ -1,52 +1,100 @@
-# AI-Powered LinkedIn Job Matching Actor
+# 🔍 AI LinkedIn Job Scraper
 
-This Apify actor uses AI to match job seekers with relevant LinkedIn job posts based on their CV, preferences, and career goals.
-
-## 🧠 How It Works
-
-The actor takes in structured user input including:
-
-- **CV**: The candidate’s resume as raw text
-- **Work Environment Preference**: e.g., hybrid, on-site, remote
-- **Work Type**: e.g., full-time, part-time, contract
-- **User Prompt**: A free-text description of the candidate’s career goals, aspirations, or specific preferences
-- **Target Number of Results**: Number of job matches to return
-- **Preferred Work Location**: A city/country name to find matching job openings (Please match the naming conventions on Linkedin)
-
-### 🔄 Workflow
-
-1. **GeoID Resolution**  
-   The actor determines the correct LinkedIn `geoId` for the user's preferred work location.
-
-2. **User Profile Analysis**  
-   An AI agent analyzes the user's CV, career preferences, and constraints to create a structured candidate profile.
-
-3. **Job Scraping**  
-   The actor uses [`curious_coder/linkedin-jobs-scraper`](https://apify.com/curious_coder/linkedin-jobs-scraper) to scrape job postings from LinkedIn based on the user's criteria.
-
-4. **Job Post Analysis**  
-   Another AI agent analyzes each job post to summarize it, extract strict requirements, and describe its potential career path.
-
-5. **Candidate-to-Job Matching**  
-   A second AI agent compares each job post to the candidate profile and evaluates:
-    - Job requirements match
-    - Career path alignment
-    - Experience level compatibility
-    - Location match
-    - Overall fit
-
-Only job posts that pass the matching criteria are returned as results.
+This Apify actor helps job seekers find tailored job opportunities on LinkedIn by analyzing their CV and preferences using AI. It intelligently matches your profile with current job listings based on your goals, experience, and preferred work conditions.
 
 ---
 
-## 📦 Output
+## ✍️ Input Fields
 
-The actor returns a list of matched job posts with annotations describing why they fit the candidate profile.
+The actor requires the following inputs:
+
+- **CV Content (`cvContent`)**  
+  Paste the content of your CV here, either in plain text or Markdown. This will be used to extract your experience, strengths, and possible roles.
+
+- **Preferred Work Environment (`workEnv`)**  
+  Select one of the following:  
+  `onSite`, `hybrid`, or `remote`
+
+- **Preferred Work Type (`workType`)**  
+  Select one of:  
+  `fullTime`, `partTime`, `contract`, or `internship`
+
+- **Location (`workLocation`)**  
+  Enter your preferred job location (e.g., “Prague, Czechia”). Use the name format shown on the [LinkedIn Job Search Page](https://www.linkedin.com/jobs/search).
+
+- **Prompt (`prompt`)**  
+  A free-form description of what kind of role you’re looking for. For example:  
+  “I want a backend role in a fast-paced startup where I can grow technically and work with a small team.”
+
+- **Number Of Results (`targetNumResults`)**  
+  Maximum number of job matches to return (up to 20).
 
 ---
 
-## 🤖 Powered by
+## 🧠 What It Does
 
-- Apify SDK
-- OpenAI API (`gpt-4o`)
-- Apify's `linkedin-jobs-scraper` actor
+This actor uses AI to act like a smart job-matching agent. Here’s what it does in simple terms:
+
+1. **Understands You**  
+   It reads your CV and prompt to understand your background, preferences, and career direction.
+
+2. **Finds Relevant Jobs**  
+   It looks for active job posts on LinkedIn that match your input preferences like location, work type, and environment.
+
+3. **Analyzes the Match**  
+   Each job post is reviewed by AI to understand its requirements and estimate how well it aligns with your profile.
+
+4. **Returns the Best Fits**  
+   You receive a list of job posts that best match your skills, goals, and preferences — with a short explanation of why each was selected.
+
+---
+
+## ✅ Output
+
+You’ll receive a list of job postings that match your profile, each including:
+
+- Job title and company
+- Location and link to the job post
+- Summary of the job
+- Reasons why it matches your profile
+- Compatibility score or notes on alignment
+
+---
+
+## 📄 Example Output
+
+```json
+[
+    {
+        "jobPost": {
+            "title": "Software Engineering Manager - Container and Virtualisation Infrastructure",
+            "companyName": "Canonical",
+            "location": "Prague, Prague, Czechia",
+            "link": "https://cz.linkedin.com/jobs/view/software-engineering-manager-container-and-virtualisation-infrastructure-at-canonical-4243830670",
+            "applyUrl": "https://grnh.se/f968d4bb1us"
+        },
+        "careerPathMatch": "Strong match. The candidate is interested in transitioning into a leadership role, aligning well with the opportunity to manage and develop a team at Canonical.",
+        "locationMatch": "Strong match. Both the candidate and the job are located in Prague, Czechia.",
+        "requirementsMatch": "Partial match. The candidate has a strong background in software development and experience as a frontend engineer, which indicates technical proficiency. However, specific experience with C and/or Go and leading engineering teams is not mentioned.",
+        "experienceLevelMatch": "Potential match. The candidate is described as experienced, which could align with the mid-senior level, but specifics on experience in leading teams are not evident."
+    }
+]
+```
+
+---
+
+## 🧩 Ideal For
+
+- Job seekers looking for smarter LinkedIn job search
+- Career changers wanting relevant opportunities
+- Early-career professionals refining their job strategy
+
+---
+
+## 🚀 Powered by
+
+- AI (GPT-4o by OpenAI)
+- Apify’s LinkedIn job scraping tools
+- Your career story
+
+Just drop in your CV, fill in your preferences, and let the actor handle the smart search for you.

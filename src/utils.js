@@ -27,9 +27,6 @@ const WORKPLACE_TYPES = {
  */
 export async function extractGeoId(workLocation) {
     try {
-        // const proxyConfiguration = await Actor.createProxyConfiguration();
-        // const proxyUrl = proxyConfiguration.newUrl();
-
         const { PROXY_USERNAME, PROXY_PASSWORD } = process.env;
 
         const searchUrl = `https://www.linkedin.com/jobs/search?keywords=&location=${encodeURIComponent(workLocation)}`;
