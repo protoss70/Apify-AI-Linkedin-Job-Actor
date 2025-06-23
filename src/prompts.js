@@ -32,32 +32,59 @@ export const prompts = {
 
     locationMatchValidation: {
         systemPrompt: `You are a geo search assistant for LinkedIn data. 
-          Your job is to compare two location strings and determine if they refer to the same place.
+        Your job is to compare two location strings and determine if they refer to the same place.
 
-          - The first string (targetLocation) is the user's original input and represents the intended target location.
-          - The second string (resolvedLocation) is the location returned by LinkedIn for that query.
+        - The first string (targetLocation) is the user's original input and represents the intended target location.
+        - The second string (resolvedLocation) is the location returned by LinkedIn for that query.
 
-          Your tasks:
-          1. Determine if they refer to the same location (match: true).
-          2. If they do not match, return a better search string to try again on LinkedIn.
+        Matching rules:
+        - If the targetLocation includes only a country, then match only based on the country.
+        - If the targetLocation includes both a city and a country, both the city and the country must match.
 
-          Respond strictly in this JSON format:
+        Your task:
+        - Determine if they refer to the same location.
 
-          {
-            "match": boolean,       // true if both locations are equivalent
-            "alternative": string   // A better search string to retry if not a match
-          }
+        Respond strictly in this JSON format:
 
-          Guidelines for generating "alternative":
-          - If the target location is a country, try variants like lowercase, alternate names, or English/localized spellings.
-          - If it's a city, return in the format: "<city>, <country>" using improved or alternate LinkedIn-friendly names.
-          Return only the JSON. Do not include any explanation or formatting outside the JSON.`,
+        {
+        "match": boolean
+        }
+
+        Do not include any explanation or formatting outside the JSON.`,
 
         userPrompt: (resolvedLocation, workLocation) =>
             `targetLocation: "${workLocation}"\nresolvedLocation: "${resolvedLocation}"\n\nCompare the two locations and return your JSON decision.`,
 
         outputSchema: z.object({
             match: z.boolean(),
+        }),
+    },
+
+    generateAlternativeLocation: {
+        systemPrompt: `You are a geo search assistant for LinkedIn. 
+        Your task is to generate a better version of a location string to improve LinkedIn geoId search accuracy.
+
+        Instructions:
+        - You will receive a user-provided location string and a list of previously tried alternatives.
+        - Your goal is to return a new location string that has NOT been tried before and is more likely to match LinkedIn's geoId system.
+
+        Guidelines:
+        - If the input is a country, return lowercase or common English/local variants (e.g., "Czechia" → "Czech Republic").
+        - If it's a city, return in the format: "<city>, <country>" and consider both English and local spellings.
+        - Avoid suggesting any location already present in the tried list.
+        - The new suggestion must be clearly different from the tried options and adhere to LinkedIn-friendly naming conventions.
+
+        Respond strictly in this JSON format:
+        {
+        "alternative": "<new suggestion>"
+        }
+
+        Do not include anything outside the JSON.`,
+            
+        userPrompt: (location, triedList) => 
+            `Original location: "${location}"\nTried alternatives: [${triedList.map(v => `"${v}"`).join(', ')}]\n\nReturn a better, untried version of this location for LinkedIn search:`,
+
+        outputSchema: z.object({
             alternative: z.string(),
         }),
     },

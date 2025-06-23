@@ -3,7 +3,7 @@ import { gotScraping } from 'got-scraping';
 
 import log from '@apify/log';
 
-import { validateLocationMatch } from './llm.js';
+import { getAlternativeLocation, validateLocationMatch } from './llm.js';
 
 const { APIFY_TOKEN } = process.env;
 
@@ -80,35 +80,43 @@ export async function extractGeoId(workLocation) {
  * Repeatedly tries to find a valid LinkedIn geoId by refining workLocation using LLM validation.
  */
 export async function geoLocationExtractor(workLocation) {
-    try {
-        let attempt = 0;
-        let currentLocation = workLocation;
+    let attempt = 0;
+    let currentLocation = workLocation;
+    const triedList = [workLocation];
 
-        while (attempt < MAX_GEO_ID_ATTEMPTS) {
-            const extracted = await extractGeoId(currentLocation);
-            if (!extracted) return false;
+    while (attempt < MAX_GEO_ID_ATTEMPTS) {
+        const extracted = await extractGeoId(currentLocation);
+        console.log(extracted);
+        if (!extracted) return false;
 
-            const { geoId, resolvedLocation } = extracted;
-            const { match, alternative } = await validateLocationMatch(resolvedLocation, currentLocation);
+        const { geoId, resolvedLocation } = extracted;
 
-            if (match) {
-                log.info('✅ Resolved geoId match:');
-                log.debug(`Original: ${workLocation}, Current: ${currentLocation}, Resolved: ${resolvedLocation}`);
-                return geoId;
-            }
-
-            log.warning(`⚠️ GeoId mismatch: ${workLocation} ≠ ${resolvedLocation}`);
-            log.info(`🔁 Attempt ${attempt + 1}: Trying alternative → "${alternative}"`);
-            currentLocation = alternative;
-            attempt++;
+        const match = await validateLocationMatch(resolvedLocation, currentLocation);
+        console.log(match);
+        if (match) {
+            log.info('✅ Resolved geoId match:');
+            log.debug(`Original: ${workLocation}, Current: ${currentLocation}, Resolved: ${resolvedLocation}`);
+            return geoId;
         }
 
-        return false;
-    } catch (error) {
-        log.error('❌ geoLocationExtractor failed:', error);
-        return false;
+        const alternative = await getAlternativeLocation(currentLocation, triedList);
+        if (!alternative || triedList.includes(alternative)) {
+            log.error('❌ No new valid alternative found. Stopping.');
+            return false;
+        }
+
+        log.warning(`⚠️ GeoId mismatch: ${workLocation} ≠ ${resolvedLocation}`);
+        log.info(`🔁 Attempt ${attempt + 1}: Trying alternative → "${alternative}"`);
+
+        triedList.push(alternative);
+        currentLocation = alternative;
+        attempt++;
     }
+
+    return false;
 }
+
+
 
 /**
  * Builds multiple LinkedIn job search URLs from filters and keyword list.

@@ -58,15 +58,40 @@ export async function validateLocationMatch(resolvedLocation, workLocation) {
     try {
         const { systemPrompt, userPrompt: buildPrompt, outputSchema } = prompts.locationMatchValidation;
 
-        return await askOpenAI({
+        const { match } = await askOpenAI({
             model: 'gpt-4o-mini',
             systemPrompt,
             userPrompt: buildPrompt(resolvedLocation, workLocation),
             outputStructure: outputSchema,
         });
+
+        return match;
     } catch (error) {
         log.error('❌ validateLocationMatch failed:', error);
         return false;
+    }
+}
+
+
+/**
+ * Generates an alternative work location for LinkedIn search using gpt-4o-mini.
+ * Avoids values already tried (in triedList).
+ */
+export async function getAlternativeLocation(currentLocation, triedList = []) {
+    try {
+        const { systemPrompt, userPrompt: buildPrompt, outputSchema } = prompts.generateAlternativeLocation;
+
+        const { alternative } = await askOpenAI({
+            model: 'gpt-4o-mini',
+            systemPrompt,
+            userPrompt: buildPrompt(currentLocation, triedList),
+            outputStructure: outputSchema,
+        });
+
+        return alternative;
+    } catch (error) {
+        log.error('❌ getAlternativeLocation failed:', error);
+        return null;
     }
 }
 
