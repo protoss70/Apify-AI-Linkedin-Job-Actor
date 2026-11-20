@@ -25,9 +25,8 @@ export async function askOpenAI({ model, systemPrompt, userPrompt, outputStructu
         },
     });
 
-    if (model === 'gpt-4o') {
-        await Actor.charge({ eventName: 'gpt-4o_call' });
-    }
+    // Charge every OpenAI call, each model at its own event price.
+    await Actor.charge({ eventName: `${model}_call` });
 
     return response.output_parsed;
 }
