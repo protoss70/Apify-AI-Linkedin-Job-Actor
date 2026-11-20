@@ -13,7 +13,7 @@ await Actor.init();
 const results = [];
 
 const input = await Actor.getInput();
-log.info('📥 Received input:');
+log.info(`📥 Received input: ${JSON.stringify(input, null, 2)}`);
 log.debug(input);
 
 const { cvContent, workEnv, workType, workLocation, prompt, targetNumResults } = input;
@@ -68,7 +68,7 @@ const urls = linkedinSearchQueryBuilder({
     keywords: possibleRoles,
 });
 
-log.info('🔗 LinkedIn Search URLs:');
+log.info(`🔗 LinkedIn Search URLs:\n${urls.join('\n')}`);
 log.debug(urls);
 
 const jobPosts = await runLinkedinJobScrapeActor({ count: 100, scrapeCompany: true, urls: [urls[0]] });
@@ -105,6 +105,9 @@ for (const job of jobPosts) {
         log.info(
             `📝 Candidate vs Job Match Result
 -----------------------------------------
+🏢 Company: ${job.companyName}
+🔗 Apply: ${job.applyUrl || job.link}
+
 📌 Job Requirements Match:
 ${jobRequirementsMatch}
 
@@ -138,11 +141,13 @@ Total Matches: ${results.length + 1}
     if (results.length >= targetNumResults) break;
 }
 
-await Actor.pushData({
-    results,
-    workLocation,
-    workType,
-    workEnv,
-});
+for (const result of results) {
+    await Actor.pushData({
+        ...result,
+        workLocation,
+        workType,
+        workEnv,
+    });
+}
 
 await Actor.exit();
